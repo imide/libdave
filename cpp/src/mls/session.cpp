@@ -564,16 +564,11 @@ bool Session::VerifyWelcomeState(::mlspp::State const& state,
         return false;
     }
 
-    // TODO: Until we leverage revocation in the protocol
-    // if we re-enable this change we will refuse welcome messages
-    // because someone was previously supposed to be added but disconnected
-    // before all in-flight proposals were handled.
-
     for (const auto& leaf : state.roster()) {
         if (!IsRecognizedUserID(leaf.credential, recognizedUserIDs)) {
             DISCORD_LOG(LS_ERROR) << "MLS welcome lists unrecognized user ID";
-            // TRACK_MLS_ERROR("Welcome message lists unrecognized user ID");
-            // return false;
+            TRACK_MLS_ERROR("Welcome message lists unrecognized user ID");
+            return false;
         }
     }
 
