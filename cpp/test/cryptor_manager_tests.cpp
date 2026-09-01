@@ -194,6 +194,82 @@ TEST_F(DaveTests, CryptorManagerNoReprocess)
     EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 11));
 }
 
+TEST_F(DaveTests, CryptorManagerEarlyMissingNonces)
+{
+    auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
+
+    MockClock clock;
+    CryptorManager cryptorManager{clock, std::move(mockKeyRatchet)};
+
+    // The first nonce we see is not the first nonce that was generated: the ones before it are
+    // missing, not non-existent, so they must still be processable if they arrive late.
+    cryptorManager.ReportCryptorSuccess(0, 3);
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 0));
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 1));
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 2));
+    EXPECT_FALSE(cryptorManager.CanProcessNonce(0, 3));
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 4));
+
+    // Late arrivals are consumed one by one, leaving the others alone.
+    cryptorManager.ReportCryptorSuccess(0, 1);
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 0));
+    EXPECT_FALSE(cryptorManager.CanProcessNonce(0, 1));
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 2));
+
+    cryptorManager.ReportCryptorSuccess(0, 0);
+    cryptorManager.ReportCryptorSuccess(0, 2);
+    EXPECT_FALSE(cryptorManager.CanProcessNonce(0, 0));
+    EXPECT_FALSE(cryptorManager.CanProcessNonce(0, 2));
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 4));
+}
+
+TEST_F(DaveTests, CryptorManagerEarlyMissingNoncesStartAtZero)
+{
+    auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
+
+    MockClock clock;
+    CryptorManager cryptorManager{clock, std::move(mockKeyRatchet)};
+
+    // Starting at nonce 0 leaves nothing missing behind it.
+    cryptorManager.ReportCryptorSuccess(0, 0);
+    EXPECT_FALSE(cryptorManager.CanProcessNonce(0, 0));
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 1));
+}
+
+TEST_F(DaveTests, CryptorManagerEarlyMissingNoncesCapped)
+{
+    auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
+
+    MockClock clock;
+    CryptorManager cryptorManager{clock, std::move(mockKeyRatchet)};
+
+    // A very late stream start only tracks the most recent kMaxMissingNonces nonces.
+    constexpr TruncatedSyncNonce kFirstNonce = kMaxMissingNonces + 5;
+    cryptorManager.ReportCryptorSuccess(0, kFirstNonce);
+    EXPECT_FALSE(cryptorManager.CanProcessNonce(0, 0));
+    EXPECT_FALSE(cryptorManager.CanProcessNonce(0, 4));
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 5));
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, kFirstNonce - 1));
+    EXPECT_FALSE(cryptorManager.CanProcessNonce(0, kFirstNonce));
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, kFirstNonce + 1));
+}
+
+TEST_F(DaveTests, CryptorManagerEarlyMissingNoncesAcrossGenerations)
+{
+    auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
+
+    MockClock clock;
+    CryptorManager cryptorManager{clock, std::move(mockKeyRatchet)};
+
+    // The bootstrap gap is measured on the wrapped big nonce, so an early generation-0 packet
+    // arriving after a generation-1 one is still processable.
+    constexpr TruncatedSyncNonce kFirstNonce = 1 << kRatchetGenerationShiftBits | 2;
+    cryptorManager.ReportCryptorSuccess(1, kFirstNonce);
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(1, kFirstNonce - 1));
+    EXPECT_FALSE(cryptorManager.CanProcessNonce(1, kFirstNonce));
+    EXPECT_TRUE(cryptorManager.CanProcessNonce(0, (1 << kRatchetGenerationShiftBits) - 1));
+}
+
 } // namespace test
 } // namespace dave
 } // namespace discord
