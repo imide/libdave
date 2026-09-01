@@ -19,7 +19,10 @@ constexpr ProtocolVersion kTestProtocolVersion = 1;
 
 } // namespace
 
-TEST_F(DaveTests, SigningKeyJwkRoundTrip)
+class KeySerializationTests : public DaveTests {
+};
+
+TEST_F(KeySerializationTests, SigningKeyJwkRoundTrip)
 {
     auto suite = mls::CiphersuiteForProtocolVersion(kTestProtocolVersion);
     auto key = ::mlspp::SignaturePrivateKey::generate(suite);
@@ -33,7 +36,7 @@ TEST_F(DaveTests, SigningKeyJwkRoundTrip)
     EXPECT_EQ(mls::SigningKeyToJwk(*restored, kTestProtocolVersion), jwk);
 }
 
-TEST_F(DaveTests, SigningKeyFromInvalidJwkReturnsNull)
+TEST_F(KeySerializationTests, SigningKeyFromInvalidJwkReturnsNull)
 {
     EXPECT_EQ(mls::SigningKeyFromJwk("not a jwk", kTestProtocolVersion), nullptr);
     EXPECT_EQ(mls::SigningKeyFromJwk("", kTestProtocolVersion), nullptr);

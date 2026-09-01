@@ -46,7 +46,10 @@ private:
     TimePoint now_{std::chrono::steady_clock::now()};
 };
 
-TEST_F(DaveTests, CryptorManagerCheckMaxGap)
+class CryptorManagerTests : public DaveTests {
+};
+
+TEST_F(CryptorManagerTests, CryptorManagerCheckMaxGap)
 {
     auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
     EXPECT_CALL(*mockKeyRatchet, GetKey(0));
@@ -69,7 +72,7 @@ TEST_F(DaveTests, CryptorManagerCheckMaxGap)
     EXPECT_NE(cryptorManager.GetCryptor(kMaxGenerationGap + 1), nullptr);
 }
 
-TEST_F(DaveTests, CryptorManagerCheckExpiry)
+TEST_F(CryptorManagerTests, CryptorManagerCheckExpiry)
 {
     auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
     EXPECT_CALL(*mockKeyRatchet, GetKey(0));
@@ -89,7 +92,7 @@ TEST_F(DaveTests, CryptorManagerCheckExpiry)
     EXPECT_EQ(cryptorManager.GetCryptor(0), nullptr);
 }
 
-TEST_F(DaveTests, CryptorManagerDeleteOldKeys)
+TEST_F(CryptorManagerTests, CryptorManagerDeleteOldKeys)
 {
     auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
     EXPECT_CALL(*mockKeyRatchet, GetKey(0));
@@ -112,7 +115,7 @@ TEST_F(DaveTests, CryptorManagerDeleteOldKeys)
     EXPECT_NE(cryptorManager.GetCryptor(5), nullptr);
 }
 
-TEST_F(DaveTests, CryptorManagerGenerationWrap)
+TEST_F(CryptorManagerTests, CryptorManagerGenerationWrap)
 {
     EXPECT_EQ(ComputeWrappedGeneration(0, 0), KeyGeneration{0});
     EXPECT_EQ(ComputeWrappedGeneration(0, 1), KeyGeneration{1});
@@ -126,7 +129,7 @@ TEST_F(DaveTests, CryptorManagerGenerationWrap)
               KeyGeneration{12 * kGenerationWrap + 10});
 }
 
-TEST_F(DaveTests, CryptorManagerBigNonce)
+TEST_F(CryptorManagerTests, CryptorManagerBigNonce)
 {
     EXPECT_EQ(ComputeWrappedBigNonce(0, 0), 0u);
     EXPECT_EQ(ComputeWrappedBigNonce(0, 1), 1u);
@@ -144,7 +147,7 @@ TEST_F(DaveTests, CryptorManagerBigNonce)
               11 << kRatchetGenerationShiftBits | 294u);
 }
 
-TEST_F(DaveTests, CryptorManagerNoReprocess)
+TEST_F(CryptorManagerTests, CryptorManagerNoReprocess)
 {
     auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
     EXPECT_CALL(*mockKeyRatchet, GetKey(0));
@@ -194,7 +197,7 @@ TEST_F(DaveTests, CryptorManagerNoReprocess)
     EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 11));
 }
 
-TEST_F(DaveTests, CryptorManagerEarlyMissingNonces)
+TEST_F(CryptorManagerTests, CryptorManagerEarlyMissingNonces)
 {
     auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
 
@@ -223,7 +226,7 @@ TEST_F(DaveTests, CryptorManagerEarlyMissingNonces)
     EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 4));
 }
 
-TEST_F(DaveTests, CryptorManagerEarlyMissingNoncesStartAtZero)
+TEST_F(CryptorManagerTests, CryptorManagerEarlyMissingNoncesStartAtZero)
 {
     auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
 
@@ -236,7 +239,7 @@ TEST_F(DaveTests, CryptorManagerEarlyMissingNoncesStartAtZero)
     EXPECT_TRUE(cryptorManager.CanProcessNonce(0, 1));
 }
 
-TEST_F(DaveTests, CryptorManagerEarlyMissingNoncesCapped)
+TEST_F(CryptorManagerTests, CryptorManagerEarlyMissingNoncesCapped)
 {
     auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
 
@@ -254,7 +257,7 @@ TEST_F(DaveTests, CryptorManagerEarlyMissingNoncesCapped)
     EXPECT_TRUE(cryptorManager.CanProcessNonce(0, kFirstNonce + 1));
 }
 
-TEST_F(DaveTests, CryptorManagerEarlyMissingNoncesAcrossGenerations)
+TEST_F(CryptorManagerTests, CryptorManagerEarlyMissingNoncesAcrossGenerations)
 {
     auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
 

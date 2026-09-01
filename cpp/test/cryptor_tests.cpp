@@ -18,7 +18,10 @@ constexpr std::string_view RandomBytes =
   "0dc5aedd5bdc3f20be5697e54dd1f437b896a36f858c6f20bbd69e2a493ca170c4f0c1b9acd4"
   "9d324b92afa788d09b12b29115a2feb3552b60fff983234a6c9608af3933683efc6b0f5579a9";
 
-TEST_F(DaveTests, PassthroughInOutBuffer)
+class CryptorTests : public DaveTests {
+};
+
+TEST_F(CryptorTests, PassthroughInOutBuffer)
 {
     auto incomingFrame = GetBufferFromHex(RandomBytes);
     auto frameCopy = incomingFrame;
@@ -52,7 +55,7 @@ TEST_F(DaveTests, PassthroughInOutBuffer)
     EXPECT_EQ(memcmp(incomingFrame.data(), frameCopy.data(), bytesWritten), 0);
 }
 
-TEST_F(DaveTests, PassthroughTwoBuffers)
+TEST_F(CryptorTests, PassthroughTwoBuffers)
 {
     auto incomingFrame = GetBufferFromHex(RandomBytes);
     auto encryptedFrame = std::vector<uint8_t>(incomingFrame.size() * 2);
@@ -87,7 +90,7 @@ TEST_F(DaveTests, PassthroughTwoBuffers)
     EXPECT_EQ(memcmp(encryptedFrame.data(), decryptedFrame.data(), decryptResult), 0);
 }
 
-TEST_F(DaveTests, SilencePacketPassthrough)
+TEST_F(CryptorTests, SilencePacketPassthrough)
 {
     const std::vector<uint8_t> WorkerSilencePacket = {248, 255, 254};
 
@@ -106,7 +109,7 @@ TEST_F(DaveTests, SilencePacketPassthrough)
     EXPECT_EQ(memcmp(WorkerSilencePacket.data(), decryptedFrame.data(), decryptResult), 0);
 }
 
-TEST_F(DaveTests, RandomOpusFrameEncryptDecrypt)
+TEST_F(CryptorTests, RandomOpusFrameEncryptDecrypt)
 {
     Encryptor encryptor;
     Decryptor decryptor;

@@ -90,7 +90,10 @@ std::optional<CommitWelcomePair> ProposeAddAndCommit(ExternalSender& externalSen
 
 } // namespace
 
-TEST_F(DaveTests, SessionJoinViaCommitAndWelcome)
+class MlsSessionTests : public DaveTests {
+};
+
+TEST_F(MlsSessionTests, SessionJoinViaCommitAndWelcome)
 {
     ExternalSender externalSender(kTestProtocolVersion, kTestGroupId);
     TestSession a(kUserA);
@@ -117,7 +120,7 @@ TEST_F(DaveTests, SessionJoinViaCommitAndWelcome)
     EXPECT_EQ(authenticatorA, authenticatorB);
 }
 
-TEST_F(DaveTests, SessionWelcomeRejectsUnrecognizedRosterUser)
+TEST_F(MlsSessionTests, SessionWelcomeRejectsUnrecognizedRosterUser)
 {
     ExternalSender externalSender(kTestProtocolVersion, kTestGroupId);
     TestSession a(kUserA);
@@ -134,7 +137,7 @@ TEST_F(DaveTests, SessionWelcomeRejectsUnrecognizedRosterUser)
     EXPECT_TRUE(b.HasFailureReason("Welcome message lists unrecognized user ID"));
 }
 
-TEST_F(DaveTests, SessionWelcomeRejectsMismatchedGroupId)
+TEST_F(MlsSessionTests, SessionWelcomeRejectsMismatchedGroupId)
 {
     ExternalSender externalSender(kTestProtocolVersion, kTestGroupId);
     TestSession a(kUserA);
@@ -152,7 +155,7 @@ TEST_F(DaveTests, SessionWelcomeRejectsMismatchedGroupId)
     EXPECT_TRUE(b.HasFailureReason("Unexpected group ID in Welcome"));
 }
 
-TEST_F(DaveTests, SessionCommitBeforeWelcomeIsRejected)
+TEST_F(MlsSessionTests, SessionCommitBeforeWelcomeIsRejected)
 {
     ExternalSender externalSender(kTestProtocolVersion, kTestGroupId);
     TestSession a(kUserA);
@@ -178,7 +181,7 @@ TEST_F(DaveTests, SessionCommitBeforeWelcomeIsRejected)
     EXPECT_TRUE(b.HasFailureReason("Unexpected commit before welcome"));
 }
 
-TEST_F(DaveTests, SessionCommitWithoutQueuedProposalsFails)
+TEST_F(MlsSessionTests, SessionCommitWithoutQueuedProposalsFails)
 {
     ExternalSender externalSender(kTestProtocolVersion, kTestGroupId);
     TestSession a(kUserA);
@@ -199,7 +202,7 @@ TEST_F(DaveTests, SessionCommitWithoutQueuedProposalsFails)
     EXPECT_TRUE(a.HasFailureReason("ProcessCommit called without queued proposals"));
 }
 
-TEST_F(DaveTests, SessionCommitWithoutAnyStateIsIgnored)
+TEST_F(MlsSessionTests, SessionCommitWithoutAnyStateIsIgnored)
 {
     ExternalSender externalSender(kTestProtocolVersion, kTestGroupId);
     TestSession a(kUserA);
@@ -218,7 +221,7 @@ TEST_F(DaveTests, SessionCommitWithoutAnyStateIsIgnored)
     EXPECT_TRUE(fresh.HasFailureReason("Received commit without state"));
 }
 
-TEST_F(DaveTests, SessionSetExternalSenderAfterJoinReportsError)
+TEST_F(MlsSessionTests, SessionSetExternalSenderAfterJoinReportsError)
 {
     ExternalSender externalSender(kTestProtocolVersion, kTestGroupId);
     TestSession a(kUserA);
@@ -237,7 +240,7 @@ TEST_F(DaveTests, SessionSetExternalSenderAfterJoinReportsError)
       a.HasFailureReason("Cannot set external sender after joining/creating an MLS group"));
 }
 
-TEST_F(DaveTests, SessionKeyPackageWithoutInitReportsError)
+TEST_F(MlsSessionTests, SessionKeyPackageWithoutInitReportsError)
 {
     TestSession s(kUserA);
     auto keyPackage = s.session->GetMarshalledKeyPackage();
@@ -245,7 +248,7 @@ TEST_F(DaveTests, SessionKeyPackageWithoutInitReportsError)
     EXPECT_TRUE(s.HasFailureReason("Missing leaf node"));
 }
 
-TEST_F(DaveTests, SessionProposalsWithoutStateReportsError)
+TEST_F(MlsSessionTests, SessionProposalsWithoutStateReportsError)
 {
     TestSession s(kUserA);
     auto result = s.session->ProcessProposals({}, {});

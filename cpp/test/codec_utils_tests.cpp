@@ -16,7 +16,10 @@ namespace discord {
 namespace dave {
 namespace test {
 
-TEST_F(DaveTests, RandomOpusFrame)
+class CodecUtilsTests : public DaveTests {
+};
+
+TEST_F(CodecUtilsTests, RandomOpusFrame)
 {
     constexpr std::string_view randomBytes =
       "0dc5aedd5bdc3f20be5697e54dd1f437b896a36f858c6f20bbd69e2a493ca170c4f0c1b9acd4"
@@ -41,7 +44,7 @@ TEST_F(DaveTests, RandomOpusFrame)
     EXPECT_EQ(unencryptedRanges.size(), 0u);
 }
 
-TEST_F(DaveTests, SplitReconstruct)
+TEST_F(CodecUtilsTests, SplitReconstruct)
 {
     std::string randomBytes =
       "0dc5aedd5bdc3f20be5697e54dd1f437b896a36f858c6f20bbd69e2a493ca170c4f0c1b9acd4"
@@ -68,7 +71,7 @@ TEST_F(DaveTests, SplitReconstruct)
     EXPECT_EQ(memcmp(incomingFrame.data(), reconstructedFrame.get(), bytesWritten), 0);
 }
 
-TEST_F(DaveTests, H264SliceOneByteExpGolomb)
+TEST_F(CodecUtilsTests, H264SliceOneByteExpGolomb)
 {
     // start code, nal unit header
     // 3 exponential golomb values (first_mb_in_slice, slice_type, pic_parameter_set_id)
@@ -91,7 +94,7 @@ TEST_F(DaveTests, H264SliceOneByteExpGolomb)
     EXPECT_EQ(unencryptedRanges.front().size, 6u);
 }
 
-TEST_F(DaveTests, H264ShortIDROneByteExpGolomb)
+TEST_F(CodecUtilsTests, H264ShortIDROneByteExpGolomb)
 {
     // SPS NAL UNIT, PPS NAL UNIT, then IDR NAL Unit
     // for IDR: nal unit header, then 3 exponential golomb values (first_mb_in_slice, slice_type,
@@ -114,7 +117,7 @@ TEST_F(DaveTests, H264ShortIDROneByteExpGolomb)
     EXPECT_EQ(unencryptedRanges.front().size, 33u);
 }
 
-TEST_F(DaveTests, H264ShortIDRTwoByteExpGolomb)
+TEST_F(CodecUtilsTests, H264ShortIDRTwoByteExpGolomb)
 {
     // SPS NAL UNIT, PPS NAL UNIT, then IDR NAL Unit
     // for IDR: nal unit header, then 3 exponential golomb values (first_mb_in_slice, slice_type,
@@ -137,7 +140,7 @@ TEST_F(DaveTests, H264ShortIDRTwoByteExpGolomb)
     EXPECT_EQ(unencryptedRanges.front().size, 34u);
 }
 
-TEST_F(DaveTests, H264LongIDROneByteExpGolomb)
+TEST_F(CodecUtilsTests, H264LongIDROneByteExpGolomb)
 {
     // SPS NAL UNIT, PPS NAL UNIT, SEI NAL unit, then IDR NAL Unit
     // which has nal unit header,
@@ -162,7 +165,7 @@ TEST_F(DaveTests, H264LongIDROneByteExpGolomb)
     EXPECT_EQ(unencryptedRanges.front().size, 67u);
 }
 
-TEST_F(DaveTests, H264LongIDRTwoByteExpGolomb)
+TEST_F(CodecUtilsTests, H264LongIDRTwoByteExpGolomb)
 {
     // SPS NAL UNIT, PPS NAL UNIT, SEI NAL unit, then IDR NAL Unit
     // which has nal unit header, then 3 exponential golomb values
@@ -187,7 +190,7 @@ TEST_F(DaveTests, H264LongIDRTwoByteExpGolomb)
     EXPECT_EQ(unencryptedRanges.front().size, 68u);
 }
 
-TEST_F(DaveTests, H264EmulationPreventionInEarlyExpGolomb)
+TEST_F(CodecUtilsTests, H264EmulationPreventionInEarlyExpGolomb)
 {
     constexpr std::string_view kH264SliceHex = "00000001610000038000e0fafafa";
 
@@ -207,7 +210,7 @@ TEST_F(DaveTests, H264EmulationPreventionInEarlyExpGolomb)
     EXPECT_EQ(unencryptedRanges.front().size, 11u);
 }
 
-TEST_F(DaveTests, H264ThreeByteShortCodeExtension)
+TEST_F(CodecUtilsTests, H264ThreeByteShortCodeExtension)
 {
     constexpr std::string_view kH264MixedShortCodes =
       "000000012764001fac2b602802dd8088000003000800000301b46d0e1970"
@@ -245,7 +248,7 @@ TEST_F(DaveTests, H264ThreeByteShortCodeExtension)
     EXPECT_EQ(compareResultExpected, 0);
 }
 
-TEST_F(DaveTests, H264TwoSliceTest)
+TEST_F(CodecUtilsTests, H264TwoSliceTest)
 {
     // start code, nal unit header
     // 3 exponential golomb values (first_mb_in_slice, slice_type, pic_parameter_set_id)
@@ -271,7 +274,7 @@ TEST_F(DaveTests, H264TwoSliceTest)
     EXPECT_EQ(unencryptedRanges[1].size, 6u);
 }
 
-TEST_F(DaveTests, H265IdrSlice)
+TEST_F(CodecUtilsTests, H265IdrSlice)
 {
     constexpr std::string_view kH265IdrSliceHex =
       "0000000140010c01ffff016000000300b0000003000003005d17024"
@@ -294,7 +297,7 @@ TEST_F(DaveTests, H265IdrSlice)
     EXPECT_EQ(unencryptedRanges.front().size, 119u);
 }
 
-TEST_F(DaveTests, H265TsaSlice)
+TEST_F(CodecUtilsTests, H265TsaSlice)
 {
     constexpr std::string_view kH265TsaSliceHex = "000000010201abab";
 
@@ -313,7 +316,7 @@ TEST_F(DaveTests, H265TsaSlice)
     EXPECT_EQ(unencryptedRanges.front().size, 6u);
 }
 
-TEST_F(DaveTests, H265SimpleThreeByteCodeExtension)
+TEST_F(CodecUtilsTests, H265SimpleThreeByteCodeExtension)
 {
     constexpr std::string_view kH265TsaSliceHexShort = "0000010201abab";
 
@@ -332,7 +335,7 @@ TEST_F(DaveTests, H265SimpleThreeByteCodeExtension)
     EXPECT_EQ(unencryptedRanges.front().size, 6u);
 }
 
-TEST_F(DaveTests, H265MultipleThreeByteCodeExtensions)
+TEST_F(CodecUtilsTests, H265MultipleThreeByteCodeExtensions)
 {
     constexpr std::string_view kH265IdrSliceHex =
       "00000140010c01ffff016000000300b0000003000003005d17024"
@@ -355,7 +358,7 @@ TEST_F(DaveTests, H265MultipleThreeByteCodeExtensions)
     EXPECT_EQ(unencryptedRanges.front().size, 119u);
 }
 
-TEST_F(DaveTests, H265TwoIdrSlice)
+TEST_F(CodecUtilsTests, H265TwoIdrSlice)
 {
     constexpr std::string_view kH265TwoIdrSliceHex = "0000010201abab0000010201abab";
 
