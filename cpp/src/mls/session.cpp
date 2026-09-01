@@ -588,22 +588,33 @@ void Session::InitLeafNode(std::string const& selfUserId,
 try {
     auto ciphersuite = CiphersuiteForProtocolVersion(protocolVersion_);
 
-    if (!transientKey) {
-        if (!signingKeyId_.empty()) {
-            transientKey = GetPersistedKeyPair(keyPairContext_, signingKeyId_, protocolVersion_);
-            if (!transientKey) {
-                DISCORD_LOG(LS_ERROR) << "Did not receive MLS signature private key from "
-                                         "GetPersistedKeyPair; aborting";
-                return;
+    // Init can run more than once per session; never reuse a key resolved by an earlier Init.
+    selfSigPrivateKey_.reset();
+
+    if (!transientKey && !signingKeyId_.empty()) {
+        try {
+            selfSigPrivateKey_ =
+              GetPersistedKeyPair(keyPairContext_, signingKeyId_, protocolVersion_);
+            if (!selfSigPrivateKey_) {
+                throw std::runtime_error("Generic failure in GetPersistedKeyPair");
             }
         }
-        else {
-            transientKey = std::make_shared<::mlspp::SignaturePrivateKey>(
-              ::mlspp::SignaturePrivateKey::generate(ciphersuite));
+        catch (std::exception& e) {
+            DISCORD_LOG(LS_INFO)
+              << "Failed to retrieve persisted key pair; falling back on transient: " << e.what();
+            if (onMLSFailureCallback_) {
+                onMLSFailureCallback_("GetPersistedKeyPair", e.what());
+            }
         }
     }
 
-    selfSigPrivateKey_ = transientKey;
+    if (!selfSigPrivateKey_) {
+        if (!transientKey) {
+            transientKey = std::make_shared<::mlspp::SignaturePrivateKey>(
+              ::mlspp::SignaturePrivateKey::generate(ciphersuite));
+        }
+        selfSigPrivateKey_ = transientKey;
+    }
 
     auto selfCredential = CreateUserCredential(selfUserId, protocolVersion_);
 

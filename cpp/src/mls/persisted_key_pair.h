@@ -30,7 +30,7 @@ struct KeyAndSelfSignature {
 
 KeyAndSelfSignature GetPersistedPublicKey(KeyPairContextType ctx,
                                           const std::string& sessionID,
-                                          SignatureVersion version);
+                                          SignatureVersion version) noexcept;
 
 bool DeletePersistedKeyPair(KeyPairContextType ctx,
                             const std::string& sessionID,
