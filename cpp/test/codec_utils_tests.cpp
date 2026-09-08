@@ -16,8 +16,7 @@ namespace discord {
 namespace dave {
 namespace test {
 
-class CodecUtilsTests : public DaveTests {
-};
+class CodecUtilsTests : public DaveTests {};
 
 TEST_F(CodecUtilsTests, RandomOpusFrame)
 {

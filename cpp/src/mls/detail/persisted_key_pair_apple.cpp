@@ -21,7 +21,7 @@
 
 // kSecUseDataProtectionKeychain is set unconditionally below, so macOS builds of this backend
 // require a 10.15+ deployment target; build with persistent keys disabled otherwise.
-#if !TARGET_OS_IPHONE && defined(__MAC_OS_X_VERSION_MIN_REQUIRED) &&                               \
+#if !TARGET_OS_IPHONE && defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && \
   __MAC_OS_X_VERSION_MIN_REQUIRED < 101500
 #error The persisted-keys Apple backend requires a macOS 10.15+ deployment target
 #endif

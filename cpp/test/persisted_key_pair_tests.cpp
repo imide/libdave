@@ -219,8 +219,7 @@ TEST_F(PersistedKeyPairTests, SessionHonorsSuppliedTransientKeyOnReinit)
 
 #elif defined(DAVE_TEST_SESSION_FALLBACK)
 
-class PersistedKeyPairTests : public DaveTests {
-};
+class PersistedKeyPairTests : public DaveTests {};
 
 // Runs in every configuration CI builds: the null implementation never yields a key.
 TEST_F(PersistedKeyPairTests, SessionFallsBackToTransientKeyWithoutPersistentKeys)

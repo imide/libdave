@@ -90,8 +90,7 @@ std::optional<CommitWelcomePair> ProposeAddAndCommit(ExternalSender& externalSen
 
 } // namespace
 
-class MlsSessionTests : public DaveTests {
-};
+class MlsSessionTests : public DaveTests {};
 
 TEST_F(MlsSessionTests, SessionJoinViaCommitAndWelcome)
 {

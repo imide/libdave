@@ -46,8 +46,7 @@ private:
     TimePoint now_{std::chrono::steady_clock::now()};
 };
 
-class CryptorManagerTests : public DaveTests {
-};
+class CryptorManagerTests : public DaveTests {};
 
 TEST_F(CryptorManagerTests, CryptorManagerCheckMaxGap)
 {

@@ -1,13 +1,13 @@
 #pragma once
 
+#include <chrono>
 #include <functional>
+#include <map>
 #include <memory>
 #include <optional>
 #include <set>
 #include <string>
-#include <map>
 #include <variant>
-#include <chrono>
 #include <vector>
 
 #include <dave/array_view.h>
@@ -21,7 +21,6 @@ struct bytes;
 
 struct SignaturePrivateKey;
 } // namespace mlspp
-
 
 namespace discord {
 namespace dave {
@@ -114,8 +113,8 @@ public:
 
 using MLSFailureCallback = std::function<void(std::string const&, std::string const&)>;
 std::unique_ptr<ISession> CreateSession(KeyPairContextType context,
-                                                    std::string authSessionId,
-                                                    MLSFailureCallback callback) noexcept;
+                                        std::string authSessionId,
+                                        MLSFailureCallback callback) noexcept;
 
 } // namespace mls
 

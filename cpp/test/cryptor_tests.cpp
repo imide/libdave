@@ -18,8 +18,7 @@ constexpr std::string_view RandomBytes =
   "0dc5aedd5bdc3f20be5697e54dd1f437b896a36f858c6f20bbd69e2a493ca170c4f0c1b9acd4"
   "9d324b92afa788d09b12b29115a2feb3552b60fff983234a6c9608af3933683efc6b0f5579a9";
 
-class CryptorTests : public DaveTests {
-};
+class CryptorTests : public DaveTests {};
 
 TEST_F(CryptorTests, PassthroughInOutBuffer)
 {

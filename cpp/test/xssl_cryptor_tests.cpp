@@ -21,8 +21,7 @@ using CryptorVariant = BoringSSLCryptor;
 using CryptorVariant = OpenSSLCryptor;
 #endif
 
-class XSSLCryptorTests : public DaveTests {
-};
+class XSSLCryptorTests : public DaveTests {};
 
 TEST_F(XSSLCryptorTests, XSSLEncryptDecrypt)
 {

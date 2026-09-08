@@ -19,8 +19,7 @@ constexpr ProtocolVersion kTestProtocolVersion = 1;
 
 } // namespace
 
-class KeySerializationTests : public DaveTests {
-};
+class KeySerializationTests : public DaveTests {};
 
 TEST_F(KeySerializationTests, SigningKeyJwkRoundTrip)
 {
