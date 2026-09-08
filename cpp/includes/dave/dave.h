@@ -25,24 +25,24 @@
 #define DAVE_EXPORT __attribute__((visibility("default")))
 #endif
 
-#define DECLARE_OPAQUE_HANDLE(x) typedef struct x##_s* x
+#define DAVE_DECLARE_OPAQUE_HANDLE(x) typedef struct x##_s* x
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /** @brief DAVE session handle for managing group encryption state */
-DECLARE_OPAQUE_HANDLE(DAVESessionHandle);
+DAVE_DECLARE_OPAQUE_HANDLE(DAVESessionHandle);
 /** @brief Result handle from processing an MLS commit message */
-DECLARE_OPAQUE_HANDLE(DAVECommitResultHandle);
+DAVE_DECLARE_OPAQUE_HANDLE(DAVECommitResultHandle);
 /** @brief Result handle from processing an MLS welcome message */
-DECLARE_OPAQUE_HANDLE(DAVEWelcomeResultHandle);
+DAVE_DECLARE_OPAQUE_HANDLE(DAVEWelcomeResultHandle);
 /** @brief Key ratchet handle for deriving encryption keys */
-DECLARE_OPAQUE_HANDLE(DAVEKeyRatchetHandle);
+DAVE_DECLARE_OPAQUE_HANDLE(DAVEKeyRatchetHandle);
 /** @brief Media frame encryptor handle */
-DECLARE_OPAQUE_HANDLE(DAVEEncryptorHandle);
+DAVE_DECLARE_OPAQUE_HANDLE(DAVEEncryptorHandle);
 /** @brief Media frame decryptor handle */
-DECLARE_OPAQUE_HANDLE(DAVEDecryptorHandle);
+DAVE_DECLARE_OPAQUE_HANDLE(DAVEDecryptorHandle);
 
 /**
  * @brief Supported media codecs for encryption
