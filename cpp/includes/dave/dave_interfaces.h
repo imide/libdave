@@ -14,6 +14,11 @@
 #include <dave/dave.h>
 #include <dave/version.h>
 
+#if defined(__ANDROID__)
+// KeyPairContextType below is JNIEnv* on Android
+#include <jni.h>
+#endif
+
 namespace mlspp {
 namespace bytes_ns {
 struct bytes;
