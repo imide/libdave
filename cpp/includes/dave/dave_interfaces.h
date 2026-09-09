@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <chrono>
 #include <functional>
 #include <map>
@@ -61,7 +62,16 @@ using RosterMap = std::map<uint64_t, std::vector<uint8_t>>;
 // Return type for functions producing RosterMap or hard or soft failures
 using RosterVariant = std::variant<failed_t, ignored_t, RosterMap>;
 
+// Identifies a protocol transition as coordinated by the signaling layer
+using TransitionId = uint16_t;
+
 constexpr auto kDefaultTransitionDuration = std::chrono::seconds(10);
+constexpr auto kInitTransitionId = 0;
+constexpr auto kDisabledVersion = 0;
+
+// The canonical Opus silence frame; encryptors may substitute it when no key
+// ratchet is active yet, and decryptors pass it through untouched
+constexpr std::array<uint8_t, 3> kOpusSilencePacket = {0xF8, 0xFF, 0xFE};
 
 class IKeyRatchet {
 public:

@@ -2,7 +2,7 @@
 
 #include <mls/crypto.h>
 
-#include "mls/key_serialization.h"
+#include <dave/key_serialization.h>
 #include "mls/parameters.h"
 
 #include "dave_test.h"
