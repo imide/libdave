@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <deque>
 #include <memory>
 #include <optional>
@@ -23,7 +24,7 @@ public:
 
     CryptorManager(const IClock& clock, std::unique_ptr<IKeyRatchet> keyRatchet);
 
-    void UpdateExpiry(TimePoint expiry) { ratchetExpiry_ = expiry; }
+    void UpdateExpiry(TimePoint expiry) { ratchetExpiry_ = std::min(ratchetExpiry_, expiry); }
     bool IsExpired() const { return clock_.Now() > ratchetExpiry_; }
 
     bool CanProcessNonce(KeyGeneration generation, TruncatedSyncNonce nonce) const;

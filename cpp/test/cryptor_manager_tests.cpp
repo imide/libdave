@@ -91,6 +91,33 @@ TEST_F(CryptorManagerTests, CryptorManagerCheckExpiry)
     EXPECT_EQ(cryptorManager.GetCryptor(0), nullptr);
 }
 
+TEST_F(CryptorManagerTests, CryptorManagerUpdateExpiryOnlyShortens)
+{
+    MockClock clock;
+    CryptorManager cryptorManager{clock, std::make_unique<MockKeyRatchet>()};
+
+    // A cryptor manager that has not been transitioned away from never expires
+    clock.Advance(1000000h);
+    EXPECT_FALSE(cryptorManager.IsExpired());
+
+    // The first transition away from this ratchet schedules its expiry
+    cryptorManager.UpdateExpiry(clock.Now() + kDefaultTransitionDuration);
+    clock.Advance(kDefaultTransitionDuration / 2);
+    EXPECT_FALSE(cryptorManager.IsExpired());
+
+    // A later transition must not push the already scheduled expiry further out
+    cryptorManager.UpdateExpiry(clock.Now() + kDefaultTransitionDuration);
+    clock.Advance(kDefaultTransitionDuration / 2 + 1us);
+    EXPECT_TRUE(cryptorManager.IsExpired());
+
+    // A later transition with a shorter window still shortens the expiry
+    CryptorManager shortLived{clock, std::make_unique<MockKeyRatchet>()};
+    shortLived.UpdateExpiry(clock.Now() + kDefaultTransitionDuration);
+    shortLived.UpdateExpiry(clock.Now() + 1s);
+    clock.Advance(1s + 1us);
+    EXPECT_TRUE(shortLived.IsExpired());
+}
+
 TEST_F(CryptorManagerTests, CryptorManagerDeleteOldKeys)
 {
     auto mockKeyRatchet = std::make_unique<MockKeyRatchet>();
