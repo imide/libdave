@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <unordered_map>
+#include <vector>
 
 #include "common.h"
 #include "cryptor.h"
@@ -26,6 +27,8 @@ public:
 
     void UpdateExpiry(TimePoint expiry) { ratchetExpiry_ = std::min(ratchetExpiry_, expiry); }
     bool IsExpired() const { return clock_.Now() > ratchetExpiry_; }
+
+    std::vector<uint8_t> GetDomainIdentity() const { return keyRatchet_->GetDomainIdentity(); }
 
     bool CanProcessNonce(KeyGeneration generation, TruncatedSyncNonce nonce) const;
     KeyGeneration ComputeWrappedGeneration(KeyGeneration generation) const;

@@ -78,6 +78,7 @@ public:
     virtual ~IKeyRatchet() noexcept = default;
     virtual EncryptionKey GetKey(KeyGeneration generation) noexcept = 0;
     virtual void DeleteKey(KeyGeneration generation) noexcept = 0;
+    virtual std::vector<uint8_t> GetDomainIdentity() const noexcept = 0;
 };
 
 namespace mls {

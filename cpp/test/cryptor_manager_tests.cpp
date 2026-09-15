@@ -9,6 +9,7 @@
 #include "utils/clock.h"
 
 #include "dave_test.h"
+#include "mock_clock.h"
 #include "static_key_ratchet.h"
 
 using namespace testing;
@@ -33,17 +34,11 @@ public:
     }
     MOCK_METHOD(EncryptionKey, GetKey, (KeyGeneration generation), (override, noexcept));
     MOCK_METHOD(void, DeleteKey, (KeyGeneration generation), (override, noexcept));
-};
 
-class MockClock : public IClock {
-public:
-    TimePoint Now() const override { return now_; }
-
-    void SetNow(TimePoint now) { now_ = now; }
-    void Advance(Duration duration) { now_ += duration; }
-
-private:
-    TimePoint now_{std::chrono::steady_clock::now()};
+    std::vector<uint8_t> GetDomainIdentity() const noexcept override
+    {
+        return {'m', 'o', 'c', 'k'};
+    }
 };
 
 class CryptorManagerTests : public DaveTests {};
@@ -171,6 +166,16 @@ TEST_F(CryptorManagerTests, CryptorManagerBigNonce)
               11 << kRatchetGenerationShiftBits | 139u);
     EXPECT_EQ(ComputeWrappedBigNonce(11, 89 << kRatchetGenerationShiftBits | 294),
               11 << kRatchetGenerationShiftBits | 294u);
+}
+
+TEST_F(CryptorManagerTests, CryptorManagerCapturesDomainIdentity)
+{
+    MockClock clock;
+
+    auto userId = std::string("12345678901234567890");
+    CryptorManager cryptorManager{clock, std::make_unique<StaticKeyRatchet>(userId)};
+    EXPECT_EQ(cryptorManager.GetDomainIdentity(),
+              std::vector<uint8_t>(userId.begin(), userId.end()));
 }
 
 TEST_F(CryptorManagerTests, CryptorManagerNoReprocess)
